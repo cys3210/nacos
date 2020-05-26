@@ -86,15 +86,24 @@ public class NacosNamingService implements NamingService {
 
     private void init(Properties properties) {
         namespace = InitUtils.initNamespaceForNaming(properties);
+
+        // 初始化server服务地址, 如果有endPoint使用endPoint (endPoint代表有服务地址管理系统)
         initServerAddr(properties);
+        // 初始化server的webContext
         InitUtils.initWebRootContext();
+        // 本地缓存目录
         initCacheDir();
+        // 日志目录
         initLogName(properties);
 
+        // 事件分发器，用于分发service相关信息给用户的监听器
         eventDispatcher = new EventDispatcher();
+        // service 的 server list 代理, 如果有endpoint会定时从地址管理服务上刷新
         serverProxy = new NamingProxy(namespace, endpoint, serverList);
         serverProxy.setProperties(properties);
+        // 心跳处理器
         beatReactor = new BeatReactor(serverProxy, initClientBeatThreadCount(properties));
+        // service host处理器
         hostReactor = new HostReactor(eventDispatcher, serverProxy, cacheDir, isLoadCacheAtStart(properties),
             initPollingThreadCount(properties));
     }
@@ -201,9 +210,10 @@ public class NacosNamingService implements NamingService {
             beatInfo.setScheduled(false);
             beatInfo.setPeriod(instance.getInstanceHeartBeatInterval());
 
+            // 添加此service相关心跳信息
             beatReactor.addBeatInfo(NamingUtils.getGroupedName(serviceName, groupName), beatInfo);
         }
-
+        // 注册到nacos server上
         serverProxy.registerService(NamingUtils.getGroupedName(serviceName, groupName), groupName, instance);
     }
 

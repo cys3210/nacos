@@ -48,6 +48,7 @@ public class RaftConsistencyServiceImpl implements PersistentConsistencyService 
     @Override
     public void put(String key, Record value) throws NacosException {
         try {
+            // 阻塞到一半以上的nacos server 返回响应
             raftCore.signalPublish(key, value);
         } catch (Exception e) {
             Loggers.RAFT.error("Raft put failed.", e);

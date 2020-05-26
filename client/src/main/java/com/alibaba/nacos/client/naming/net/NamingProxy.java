@@ -88,6 +88,7 @@ public class NamingProxy {
             }
         }
 
+        // 定时刷新 nacos server list
         initRefreshSrvIfNeed();
     }
 

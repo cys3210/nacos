@@ -106,6 +106,7 @@ public class Cluster extends com.alibaba.nacos.api.naming.pojo.Cluster implement
         if (inited) {
             return;
         }
+        // 此处为nacos servcer主动检查service健康状态的入口, 此类需要nacos server主动检查的都为persistence节点
         checkTask = new HealthCheckTask(this);
 
         HealthCheckReactor.scheduleCheck(checkTask);

@@ -432,6 +432,7 @@ public class RaftCore {
         }
 
         RaftPeer local = peers.get(NetUtils.localServer());
+        // term 相同选择自己  1  2  3
         if (remote.term.get() <= local.term.get()) {
             String msg = "received illegitimate vote" +
                 ", voter-term:" + remote.term + ", votee-term:" + local.term;

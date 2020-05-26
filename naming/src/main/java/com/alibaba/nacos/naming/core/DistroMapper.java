@@ -79,6 +79,8 @@ public class DistroMapper implements ServerChangeListener {
             return true;
         }
 
+
+        // 判断指定serviceName属不属于自己管理
         int target = distroHash(serviceName) % healthyList.size();
         return target >= index && target <= lastIndex;
     }

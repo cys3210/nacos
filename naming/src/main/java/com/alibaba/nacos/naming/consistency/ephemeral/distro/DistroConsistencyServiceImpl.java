@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.concurrent.*;
 
 /**
+ * nacos 数据一致性算法
  * A consistency protocol algorithm called <b>Distro</b>
  * <p>
  * Use a distro algorithm to divide data into many blocks. Each Nacos server node takes
@@ -109,6 +110,7 @@ public class DistroConsistencyServiceImpl implements EphemeralConsistencyService
             @Override
             public void run() {
                 try {
+                    // 尝试从其他的nacos server获取其他的实例信息
                     load();
                 } catch (Exception e) {
                     Loggers.DISTRO.error("load data failed.", e);

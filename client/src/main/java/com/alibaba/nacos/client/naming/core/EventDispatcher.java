@@ -115,6 +115,7 @@ public class EventDispatcher {
             while (true) {
                 ServiceInfo serviceInfo = null;
                 try {
+                    // 拿到发生改变的service
                     serviceInfo = changedServices.poll(5, TimeUnit.MINUTES);
                 } catch (Exception ignore) {
                 }
@@ -124,6 +125,7 @@ public class EventDispatcher {
                 }
 
                 try {
+                    // 通知监听器
                     List<EventListener> listeners = observerMap.get(serviceInfo.getKey());
 
                     if (!CollectionUtils.isEmpty(listeners)) {

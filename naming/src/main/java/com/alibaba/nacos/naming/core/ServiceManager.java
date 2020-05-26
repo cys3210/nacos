@@ -501,11 +501,13 @@ public class ServiceManager implements RecordListener<Service> {
         Service service = getService(namespaceId, serviceName);
 
         synchronized (service) {
+            // 更新此service的ip集合
             List<Instance> instanceList = addIpAddresses(service, ephemeral, ips);
 
             Instances instances = new Instances();
             instances.setInstanceList(instanceList);
 
+            // 此service相关信息更新后的加入到一致性服务
             consistencyService.put(key, instances);
         }
     }
@@ -558,7 +560,9 @@ public class ServiceManager implements RecordListener<Service> {
         Datum datum = consistencyService.get(KeyBuilder.buildInstanceListKey(service.getNamespaceId(), service.getName(), ephemeral));
 
         List<Instance> currentIPs = service.allIPs(ephemeral);
+        // 当前ip-服务实例的map集合
         Map<String, Instance> currentInstances = new HashMap<>(currentIPs.size());
+        // 当前服务实例id集合
         Set<String> currentInstanceIds = Sets.newHashSet();
 
         for (Instance instance : currentIPs) {
@@ -585,6 +589,7 @@ public class ServiceManager implements RecordListener<Service> {
             if (UtilsAndCommons.UPDATE_INSTANCE_ACTION_REMOVE.equals(action)) {
                 instanceMap.remove(instance.getDatumKey());
             } else {
+                // 更新服务实例
                 instance.setInstanceId(instance.generateInstanceId(currentInstanceIds));
                 instanceMap.put(instance.getDatumKey(), instance);
             }
@@ -644,7 +649,9 @@ public class ServiceManager implements RecordListener<Service> {
     }
 
     private void putServiceAndInit(Service service) throws NacosException {
+        // 加入注册表
         putService(service);
+        // 初始化
         service.init();
         consistencyService.listen(KeyBuilder.buildInstanceListKey(service.getNamespaceId(), service.getName(), true), service);
         consistencyService.listen(KeyBuilder.buildInstanceListKey(service.getNamespaceId(), service.getName(), false), service);

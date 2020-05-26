@@ -90,9 +90,11 @@ public class InstanceController {
     @PostMapping
     public String register(HttpServletRequest request) throws Exception {
 
+        // service name 必须
         String serviceName = WebUtils.required(request, CommonParams.SERVICE_NAME);
+        // namespaceId 可选
         String namespaceId = WebUtils.optional(request, CommonParams.NAMESPACE_ID, Constants.DEFAULT_NAMESPACE_ID);
-
+        // 注册服务实例
         serviceManager.registerInstance(namespaceId, serviceName, parseInstance(request));
         return "ok";
     }

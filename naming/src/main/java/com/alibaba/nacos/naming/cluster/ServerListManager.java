@@ -72,7 +72,9 @@ public class ServerListManager {
 
     @PostConstruct
     public void init() {
+        // nacos集群定时更新
         GlobalExecutor.registerServerListUpdater(new ServerListUpdater());
+        // nacos集群状态定时检测上报
         GlobalExecutor.registerServerStatusReporter(new ServerStatusReporter(), 2000);
     }
 
@@ -90,6 +92,7 @@ public class ServerListManager {
 
         List<String> serverList = new ArrayList<>();
         try {
+            // 从配置中读取 nacos server list
             serverList = readClusterConf();
         } catch (Exception e) {
             Loggers.SRV_LOG.warn("failed to get config: " + CLUSTER_CONF_FILE_PATH, e);
@@ -286,6 +289,7 @@ public class ServerListManager {
         @Override
         public void run() {
             try {
+                // 从配置中读取最新的 nacos server信息
                 List<Server> refreshedServers = refreshServerList();
                 List<Server> oldServers = servers;
 
@@ -311,6 +315,7 @@ public class ServerListManager {
                 }
 
                 if (changed) {
+                    // 通知所有的监听器，server发生了改变
                     notifyListeners();
                 }
 
@@ -331,6 +336,8 @@ public class ServerListManager {
                     return;
                 }
 
+                // 检查 nacos server 的发布心跳（即通过配置文件过期掉部分nacos server）
+                // 更新配置
                 checkDistroHeartbeat();
 
                 int weight = Runtime.getRuntime().availableProcessors() / 2;
@@ -351,6 +358,7 @@ public class ServerListManager {
                     return;
                 }
 
+                // 同步集群状态
                 if (allServers.size() > 0 && !NetUtils.localServer().contains(UtilsAndCommons.LOCAL_HOST_IP)) {
                     for (com.alibaba.nacos.naming.cluster.servers.Server server : allServers) {
                         if (server.getKey().equals(NetUtils.localServer())) {
@@ -415,6 +423,7 @@ public class ServerListManager {
         }
 
         Collections.sort(newHealthyList);
+        // 当前 nacos server list 的健康率
         float curRatio = (float) newHealthyList.size() / allLocalSiteSrvs.size();
 
         if (autoDisabledHealthCheck

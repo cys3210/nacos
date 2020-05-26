@@ -120,6 +120,7 @@ public class DistroFilter implements Filter {
 
                 String body = IoUtils.toString(req.getInputStream(), Charsets.UTF_8.name());
 
+                // 转发到指定的nacos server 上
                 HttpClient.HttpResult result =
                     HttpClient.request("http://" + distroMapper.mapSrv(groupedServiceName) + urlString, headerList,
                         StringUtils.isBlank(req.getQueryString()) ? HttpClient.translateParameterMap(req.getParameterMap()) : new HashMap<>(2)

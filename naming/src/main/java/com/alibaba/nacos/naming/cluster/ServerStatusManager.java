@@ -49,6 +49,7 @@ public class ServerStatusManager {
 
     private void refreshServerStatus() {
 
+        // 更新本地服务状态
         if (StringUtils.isNotBlank(switchDomain.getOverriddenServerStatus())) {
             serverStatus = ServerStatus.valueOf(switchDomain.getOverriddenServerStatus());
             return;

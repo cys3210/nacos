@@ -64,10 +64,13 @@ public class FailoverReactor {
 
     public void init() {
 
+        // 故障转移开关定时扫描
         executorService.scheduleWithFixedDelay(new SwitchRefresher(), 0L, 5000L, TimeUnit.MILLISECONDS);
 
+        // service缓存定时写入磁盘
         executorService.scheduleWithFixedDelay(new DiskFileWriter(), 30, DAY_PERIOD_MINUTES, TimeUnit.MINUTES);
 
+        // 初始化service缓存到故障转移文件路径
         // backup file on startup if failover directory is empty.
         executorService.schedule(new Runnable() {
             @Override

@@ -86,6 +86,7 @@ public class HttpHealthCheckProcessor implements HealthCheckProcessor {
 
     @Override
     public void process(HealthCheckTask task) {
+        // 所有持久化的服务都可以提供健康检查接口，让nacos server 主动的去检查
         List<Instance> ips = task.getCluster().allIPs(false);
         if (CollectionUtils.isEmpty(ips)) {
             return;

@@ -75,16 +75,19 @@ public class HostReactor {
             }
         });
 
+        // 事件分发器
         this.eventDispatcher = eventDispatcher;
         this.serverProxy = serverProxy;
         this.cacheDir = cacheDir;
         if (loadCacheAtStart) {
+            // 从磁盘读取服务列表缓存
             this.serviceInfoMap = new ConcurrentHashMap<String, ServiceInfo>(DiskCache.read(this.cacheDir));
         } else {
             this.serviceInfoMap = new ConcurrentHashMap<String, ServiceInfo>(16);
         }
 
         this.updatingMap = new ConcurrentHashMap<String, Object>();
+        // 故障转移处理器
         this.failoverReactor = new FailoverReactor(this, cacheDir);
         this.pushReceiver = new PushReceiver(this);
     }
@@ -180,11 +183,14 @@ public class HostReactor {
             serviceInfo.setJsonFromServer(json);
 
             if (newHosts.size() > 0 || remvHosts.size() > 0 || modHosts.size() > 0) {
+                // 通知所有的监听器service发生了改变
                 eventDispatcher.serviceChanged(serviceInfo);
+                // 重新写入磁盘中以支持故障转移
                 DiskCache.write(serviceInfo, cacheDir);
             }
 
         } else {
+            // 第一次接收到此service相关的信息
             changed = true;
             NAMING_LOGGER.info("init new ips(" + serviceInfo.ipCount() + ") service: " + serviceInfo.getKey() + " -> " + JSON
                 .toJSONString(serviceInfo.getHosts()));
